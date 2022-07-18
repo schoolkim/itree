@@ -7,12 +7,12 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: BaseViewController {
     
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var topicContainerView: UIView!
     @IBOutlet weak var addToDoButton: UIButton!
-    @IBOutlet weak var textFieldContainerView: UIView!
+    @IBOutlet weak var bottomStackView: UIStackView!
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var collectionView: UICollectionView!
     
@@ -20,10 +20,10 @@ class ViewController: UIViewController {
     var collectionViewDataSource: UICollectionViewDiffableDataSource<Section, Todo>!
     
     var date: Date!
-    
     var topicDataStore = ["All", "Today", "This Week", "This Month"]
     var selectedString: String!
     var contentConfiguration: UIListContentConfiguration!
+    var addTodoButtonBottomConstraint: NSLayoutConstraint?
     var coreDataStore = CoreDataStore.shared
     var filteredDataStore = [Todo]()
     var isFiltering: Bool {
@@ -51,7 +51,12 @@ class ViewController: UIViewController {
         
         super.viewDidLoad()
         
-        textFieldContainerView.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor).isActive = true
+        let addTodoButtonBottomKeyboardConstraint = addToDoButton.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor, constant: -8)
+        addTodoButtonBottomKeyboardConstraint.priority = .defaultLow
+        addTodoButtonBottomKeyboardConstraint.isActive = true
+        addTodoButtonBottomConstraint = addToDoButton.bottomAnchor.constraint(equalTo: bottomStackView.topAnchor, constant: -8)
+        addTodoButtonBottomConstraint?.priority = .defaultHigh
+        bottomStackView.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor).isActive = true
         
         topicViewController?.applyInitialData(items: topicDataStore)
         let label = createTitleLabel()
@@ -99,6 +104,7 @@ class ViewController: UIViewController {
             }
             self.dateLabel.text = ""
             self.textField.text = ""
+            self.textField.placeholder = "날짜와 시간을 선택해주세요"
         }
     }
 
@@ -340,19 +346,24 @@ class ViewController: UIViewController {
         let leftSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let doneButton = UIBarButtonItem(title: "done", style: .plain, target: nil, action: #selector(tappedDoneButton))
         var buttonList = [UIBarButtonItem]()
-        
+
         buttonList.append(dateButton)
         buttonList.append(todayButton)
         buttonList.append(leftSpace)
         buttonList.append(doneButton)
-        
+
         buttonList.forEach { bt in
             bt.tintColor = .black
         }
-        
+
         toolbar.sizeToFit()
         toolbar.setItems(buttonList, animated: false)
         textField.inputAccessoryView = toolbar
+    }
+    
+    override func willChangeKeyboard(isHidden: Bool) {
+        bottomStackView.isHidden = isHidden
+        addTodoButtonBottomConstraint?.isActive = !isHidden
     }
 }
 
