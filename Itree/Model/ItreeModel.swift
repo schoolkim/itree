@@ -11,6 +11,13 @@ enum Section {
     case Main
 }
 
+enum Filter: String {
+    case All = "All"
+    case Today = "Today"
+    case Week = "This Week"
+    case Month = "This Month"
+}
+
 extension Date {
     var year: Int {
         return Calendar.current.component(.year, from: self)
