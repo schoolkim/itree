@@ -16,21 +16,17 @@ class TopicViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     
     private var collectionDataSource: UICollectionViewDiffableDataSource<String, String>!
-    
     weak var eventDelegate: TopicViewControllerEvent?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         collectionView.alwaysBounceVertical = false
-        
         collectionView.delegate = self
         configureDataSource()
         configureCollectionViewLayout()
-
     }
 
-    
     func configureDataSource() {
         let topicCellRegistration = UICollectionView.CellRegistration<TopicCell, String>(cellNib: TopicCell.nib) { cell, indexPath, itemIdentifier in
             cell.configureCell(itemIdentifier: itemIdentifier)
@@ -63,7 +59,6 @@ class TopicViewController: UIViewController {
             self?.collectionView.selectItem(at: IndexPath(item: 0, section: 0), animated: false, scrollPosition: [])
         }
     }
-    
 }
 
 extension TopicViewController: UICollectionViewDelegate {
@@ -72,18 +67,5 @@ extension TopicViewController: UICollectionViewDelegate {
         if let itemIdentifier = collectionDataSource.itemIdentifier(for: indexPath) {
             eventDelegate?.topic(self, didSelectedItem: itemIdentifier)
         }
-        
     }
 }
-
-extension UIColor {
-    class var random: UIColor {
-        UIColor(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1)
-    }
-}
-
-
-    
-
-    
-
