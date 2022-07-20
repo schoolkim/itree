@@ -7,8 +7,9 @@
 
 import UIKit
 
+// MARK: BaseViewController
+
 class BaseViewController: UIViewController {
-    
     private(set) var isHiddenKeyboard: Bool = false
     
     override func viewDidLoad() {
@@ -22,24 +23,28 @@ class BaseViewController: UIViewController {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
-    @objc private func _willShowKeyboard(notification: NSNotification) {
+    @objc
+    private func _willShowKeyboard(notification: NSNotification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
         isHiddenKeyboard = false
         willShowKeyboard(frame: keyboardFrame.cgRectValue)
         willChangeKeyboard(isHidden: false)
     }
     
-    @objc func willShowKeyboard(frame: CGRect) {
+    @objc
+    func willShowKeyboard(frame: CGRect) {
         
     }
     
-    @objc private func _willHideKeyboard() {
+    @objc
+    private func _willHideKeyboard() {
         isHiddenKeyboard = true
         willHideKeyboard()
         willChangeKeyboard(isHidden: true)
     }
     
-    @objc func willHideKeyboard() {
+    @objc
+    func willHideKeyboard() {
         
     }
     

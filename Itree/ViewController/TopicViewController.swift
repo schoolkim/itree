@@ -11,8 +11,9 @@ protocol TopicViewControllerEvent: AnyObject {
     func topic(_ viewController: TopicViewController, didSelectedItem: String)
 }
 
+// MARK: TopicViewController
+
 class TopicViewController: UIViewController {
-    
     @IBOutlet weak var collectionView: UICollectionView!
     
     private var collectionDataSource: UICollectionViewDiffableDataSource<String, String>!
@@ -39,9 +40,9 @@ class TopicViewController: UIViewController {
     }
     
     func configureCollectionViewLayout() {
-        let itemLayoutSize = NSCollectionLayoutSize(widthDimension: .estimated(128), heightDimension: .fractionalHeight(1.0))
+        let itemLayoutSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
         let itemLayout = NSCollectionLayoutItem(layoutSize: itemLayoutSize)
-        let groupLayoutSize = NSCollectionLayoutSize(widthDimension: .estimated(128), heightDimension: .absolute(44))
+        let groupLayoutSize = NSCollectionLayoutSize(widthDimension: .estimated(88), heightDimension: .absolute(44))
         let groupLayout = NSCollectionLayoutGroup.horizontal(layoutSize: groupLayoutSize, subitems: [itemLayout])
         let sectionLayout = NSCollectionLayoutSection(group: groupLayout)
         sectionLayout.orthogonalScrollingBehavior = .continuous
@@ -60,6 +61,8 @@ class TopicViewController: UIViewController {
         }
     }
 }
+
+// MARK: UICollectionViewDelegate
 
 extension TopicViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {

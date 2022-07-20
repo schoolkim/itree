@@ -11,9 +11,9 @@ enum Section {
     case Main
 }
 
-enum Filter: String {
-    case All = "All"
-    case Today = "Today"
+enum Filter: String, CaseIterable {
+    case All
+    case Today
     case Week = "This Week"
     case Month = "This Month"
 }

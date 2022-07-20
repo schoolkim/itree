@@ -7,25 +7,35 @@
 
 import UIKit
 
+// MARK: ViewController
+
 class ViewController: BaseViewController {
-    
-    @IBOutlet weak var dateLabel: UILabel!
-    @IBOutlet weak var topicContainerView: UIView!
     @IBOutlet weak var addToDoButton: UIButton!
     @IBOutlet weak var bottomStackView: UIStackView!
-    @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var dateLabel: UILabel!
+    @IBOutlet weak var textField: UITextField!
+    @IBOutlet weak var topicContainerView: UIView!
+    
+    // MARK: Public
     
     weak var topicViewController: TopicViewController?
     var collectionViewDataSource: UICollectionViewDiffableDataSource<Section, Todo>!
-    
-    var date: Date!
-    var topicDataStore = ["All", "Today", "This Week", "This Month"]
     var selectedString: String!
     var contentConfiguration: UIListContentConfiguration!
     var addTodoButtonBottomConstraint: NSLayoutConstraint?
     var coreDataStore = CoreDataStore.shared
     var filteredDataStore = [Todo]()
+    
+    // MARK: Static
+    
+    static var date: Date!
+    static var dateString: String!
+    
+    // MARK: Private
+    
+    private(set) static var shared: ViewController!
+    
     var isFiltering: Bool {
         let searchController = self.navigationItem.searchController
         let isActive = searchController?.isActive ?? false
@@ -33,7 +43,15 @@ class ViewController: BaseViewController {
         return isActive && hasText
     }
     
-    var dateFormatter: DateFormatter = {
+    var topicDataStore: [String] = {
+        var strArray = [String]()
+        Filter.allCases.forEach { element in
+            strArray.append(element.rawValue)
+        }
+        return strArray
+    }()
+    
+    var collectionViewCellSecondaryTextFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .none
         formatter.dateFormat = "yyyy년 MM월 dd일 HH시 mm분"
@@ -46,10 +64,10 @@ class ViewController: BaseViewController {
         formatter.dateFormat = "yyyy년 MM월 dd일 HH시 mm분 ss초"
         return formatter
     }()
-    
+
     override func viewDidLoad() {
-        
         super.viewDidLoad()
+        ViewController.shared = self
         
         let addTodoButtonBottomKeyboardConstraint = addToDoButton.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor, constant: -8)
         addTodoButtonBottomKeyboardConstraint.priority = .defaultLow
@@ -64,10 +82,11 @@ class ViewController: BaseViewController {
         
         dateLabel.textColor = .label
         dateLabel.font = UIFont.boldSystemFont(ofSize: 15)
+        dateLabel.text = ""
         
         addToDoButton.layer.cornerRadius = 0.5 * addToDoButton.bounds.width
         addToDoButton.clipsToBounds = true
-
+        
         createDatePickerView()
         setupSearchController()
         configureCollectionViewLayout()
@@ -93,11 +112,14 @@ class ViewController: BaseViewController {
     @IBAction func tappedAddToDoButton(_ sender: Any) {
         if !textField.isFirstResponder {
             textField.becomeFirstResponder()
+            if dateLabel.text == "" {
+                dateLabel.isHidden = true
+            }
             UIView.animate(withDuration: 0.5) {
                 self.addToDoButton.transform = .init(rotationAngle: 45 / 180 * .pi)
             }
-            
-        } else {
+        }
+        else {
             textField.resignFirstResponder()
             UIView.animate(withDuration: 0.5) {
                 self.addToDoButton.transform = .identity
@@ -107,61 +129,21 @@ class ViewController: BaseViewController {
             self.textField.placeholder = "날짜와 시간을 선택해주세요"
         }
     }
+    
+    // TODO: sheetPresentationController dismiss하고 나면 addTodoButton color 변경됨
 
-    @objc func tappedDateButton() {
-        
-        let myDatePicker = createDatePicker()
-        let alertController = UIAlertController(title: "\n\n\n\n\n\n\n\n\n\n\n\n\n\t\t\t\t", message: nil, preferredStyle: .alert)
-        alertController.view.addSubview(myDatePicker)
-        let somethingAction = UIAlertAction(title: "Ok", style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            
-            let formatter = DateFormatter()
-            formatter.timeStyle = .none
-            formatter.dateFormat = "yyyy/MM/dd - HH:mm "
-            self.date = myDatePicker.date
-            let date = formatter.string(from: myDatePicker.date)
-            self.dateLabel.text = date
-            self.textField.placeholder = "할 일을 입력해주세요"
-            self.textField.becomeFirstResponder()
-        }
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        alertController.addAction(somethingAction)
-        alertController.addAction(cancelAction)
-        self.present(alertController, animated: true, completion:{})
+    @objc
+    func tappedDateButton() {
+        showDatePickerSheetPresentationController()
     }
     
-    @objc func tappedTodayButton() {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .none
-        formatter.dateFormat = "yyyy/MM/dd"
-        dateLabel.text = formatter.string(from: .now)
-        
-        let todayAlert = UIAlertController(title: "시간을 선택해주세요\n\n", message: nil, preferredStyle: .alert)
-        let todayPicker = UIDatePicker()
-        todayPicker.datePickerMode = .time
-        todayPicker.bounds = CGRect(x: 5, y: -55, width:200, height: 50)
-        todayAlert.view.addSubview(todayPicker)
-        
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        let ok = UIAlertAction(title: "Ok", style: .default) { [weak self] _ in
-            guard let self = self else { return }
-            
-            let formatter = DateFormatter()
-            formatter.timeStyle = .none
-            formatter.dateFormat = " - HH:mm "
-            self.date = todayPicker.date
-            let date = formatter.string(from: todayPicker.date)
-            self.dateLabel.text = (self.dateLabel.text ?? "") + date
-            self.textField.placeholder = "할 일을 입력해주세요"
-        }
-        todayAlert.addAction(cancel)
-        todayAlert.addAction(ok)
-        self.present(todayAlert, animated: false)
+    @objc
+    func tappedTodayButton() {
+        showTodayPickerSheetPresentationController()
     }
     
-    @objc func tappedDoneButton() {
+    @objc
+    func tappedDoneButton() {
         guard let filterText = Filter(rawValue: selectedString) else { return }
         
         if self.dateLabel.text == "" {
@@ -170,7 +152,8 @@ class ViewController: BaseViewController {
             alert.addAction(cancel)
             self.present(alert, animated: false)
             return
-        } else if self.textField.text == "" {
+        }
+        else if self.textField.text == "" {
             textField.text = ""
             let alert = UIAlertController(title: "할 일을 입력해주세요", message: "", preferredStyle: .alert)
             let cancel = UIAlertAction(title: "확인", style: .cancel)
@@ -180,16 +163,15 @@ class ViewController: BaseViewController {
         }
         
         let resultString = self.textField.text
-        self.coreDataStore.createTodo(text: resultString ?? "", date: date)
+        self.coreDataStore.createTodo(text: resultString ?? "", date: ViewController.date)
         textField.resignFirstResponder()
         self.textField.text = ""
+        self.dateLabel.text = ""
+        self.textField.placeholder = "날짜와 시간을 선택해주세요"
         UIView.animate(withDuration: 0.5) {
             self.addToDoButton.transform = .identity
         }
-        
         configureSnapshot(filterText)
-        self.dateLabel.text = ""
-        self.textField.placeholder = "날짜와 시간을 선택해주세요"
     }
     
     func configureSnapshot(_ selectedString: Filter) {
@@ -223,15 +205,25 @@ class ViewController: BaseViewController {
         self.navigationItem.searchController = searchController
         self.navigationItem.hidesSearchBarWhenScrolling = false
     }
-   
+    
+    func showDatePickerSheetPresentationController() {
+        let navigationController = UINavigationController(rootViewController: DatePickerSheetPresentationController())
+        self.present(navigationController, animated: true, completion: nil)
+    }
+    
+    func showTodayPickerSheetPresentationController() {
+        let navigationController = UINavigationController(rootViewController: TodayPickerSheetPresentationController())
+        self.present(navigationController, animated: true, completion: nil)
+    }
+    
     func configureCollectionViewLayout() {
-        
         var layoutConfig = UICollectionLayoutListConfiguration(appearance: .plain)
         layoutConfig.backgroundColor = .systemBackground
         layoutConfig.trailingSwipeActionsConfigurationProvider = {
             [weak self] indexPath in
+            guard let self = self else { return nil }
             
-            let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] action, view, completion in
+            let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] _, _, completion in
                 guard let self = self,
                       let selectedTodo = self.collectionViewDataSource.itemIdentifier(for: indexPath),
                       let uuid = self.collectionViewDataSource.itemIdentifier(for: indexPath)?.uuid?.uuidString else {
@@ -250,57 +242,43 @@ class ViewController: BaseViewController {
                 UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [uuid])
             }
             
-            let fixAction = UIContextualAction(style: .normal, title: "Fix") { [weak self] action, view, completion in
-                guard let self = self,
-                      let selectedTodo = self.collectionViewDataSource.itemIdentifier(for: indexPath) else {
-                    completion(false)
-                    return
-                }
-                
-                selectedTodo.fix.toggle()
-                selectedTodo.updateAt = Date()
-                self.coreDataStore.saveContext()
-                
-                var snapshot = self.collectionViewDataSource.snapshot()
-                snapshot.reconfigureItems([selectedTodo])
-                snapshot.deleteItems(self.coreDataStore.fetchTodo())
-                snapshot.appendItems(self.sort())
-                self.collectionViewDataSource.apply(snapshot, animatingDifferences: true) {
-                    self.collectionView.deselectItem(at: indexPath, animated: true)
-                    completion(true)
-                }
-            }
-            
-            let unFixAction = UIContextualAction(style: .normal, title: "UnFix") { [weak self] action, view, completion in
-                guard let self = self,
-                      let selectedTodo = self.collectionViewDataSource.itemIdentifier(for: indexPath) else {
-                    completion(false)
-                    return
-                }
-                
-                selectedTodo.fix.toggle()
-                selectedTodo.updateAt = Date()
-                self.coreDataStore.saveContext()
-                
-                var snapshot = self.collectionViewDataSource.snapshot()
-                snapshot.reconfigureItems([selectedTodo])
-                snapshot.deleteItems(self.coreDataStore.fetchTodo())
-                snapshot.appendItems(self.sort())
-                self.collectionViewDataSource.apply(snapshot, animatingDifferences: true) {
-                    self.collectionView.deselectItem(at: indexPath, animated: true)
-                    completion(true)
-                }
-            }
-            
-            return self?.collectionViewDataSource.itemIdentifier(for: indexPath)?.fix ?? false ? UISwipeActionsConfiguration(actions: [deleteAction, unFixAction]) : UISwipeActionsConfiguration(actions: [deleteAction, fixAction])
+            let fixAction = self.changeFixedAction("Fix", indexPath)
+            let unFixAction = self.changeFixedAction("UnFix", indexPath)
+            return self.collectionViewDataSource.itemIdentifier(for: indexPath)?.fix ?? false
+                ? UISwipeActionsConfiguration(actions: [deleteAction, unFixAction])
+                : UISwipeActionsConfiguration(actions: [deleteAction, fixAction])
         }
         
         let listLayout = UICollectionViewCompositionalLayout.list(using: layoutConfig)
         collectionView.collectionViewLayout = listLayout
     }
     
+    func changeFixedAction(_ title: String, _ indexPath: IndexPath) -> UIContextualAction {
+        let changeFixedAction = UIContextualAction(style: .normal, title: title) { [weak self] _, _, completion in
+            guard let self = self,
+                  let selectedTodo = self.collectionViewDataSource.itemIdentifier(for: indexPath) else {
+                completion(false)
+                return
+            }
+            
+            selectedTodo.fix.toggle()
+            selectedTodo.updateAt = Date()
+            self.coreDataStore.saveContext()
+            
+            var snapshot = self.collectionViewDataSource.snapshot()
+            snapshot.reconfigureItems([selectedTodo])
+            snapshot.deleteItems(self.coreDataStore.fetchTodo())
+            snapshot.appendItems(self.sort())
+            self.collectionViewDataSource.apply(snapshot, animatingDifferences: true) {
+                self.collectionView.deselectItem(at: indexPath, animated: true)
+                completion(true)
+            }
+        }
+        return changeFixedAction
+    }
+    
     func configureCollectionViewDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Todo>.init { [weak self] cell, indexPath, itemIdentifier in
+        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Todo>.init { [weak self] cell, _, itemIdentifier in
             
             guard let self = self else { return }
             
@@ -308,15 +286,18 @@ class ViewController: BaseViewController {
             self.contentConfiguration.imageProperties.tintColor = .black
             self.contentConfiguration.image = itemIdentifier.fix ? UIImage(systemName: "pin.fill") : nil
             
+            // TODO: fix된 상태로 completed로 바꾼 후 unfix하고 completed 풀면 strikeThrough 적용됨
+            
             if itemIdentifier.completed {
                 self.contentConfiguration.attributedText = itemIdentifier.content?.strikeThrough()
-            } else {
+            }
+            else {
                 self.contentConfiguration.text = itemIdentifier.content
                 self.contentConfiguration.attributedText = nil
             }
             
             if let todoAt = itemIdentifier.todoAt {
-                self.contentConfiguration.secondaryText = itemIdentifier.fix ? "Every Day" : self.dateFormatter.string(from: todoAt)
+                self.contentConfiguration.secondaryText = itemIdentifier.fix ? "Every Day" : self.collectionViewCellSecondaryTextFormatter.string(from: todoAt)
             }
             self.contentConfiguration.secondaryTextProperties.color = .secondaryLabel
             cell.contentConfiguration = self.contentConfiguration
@@ -327,15 +308,6 @@ class ViewController: BaseViewController {
             
             return cell
         }
-    }
-    
-    func createDatePicker() -> UIDatePicker {
-        let myDatePicker: UIDatePicker = UIDatePicker()
-        myDatePicker.timeZone = NSTimeZone.local
-        myDatePicker.preferredDatePickerStyle = .inline
-        myDatePicker.frame = CGRect(x: 15, y: 15, width: 250, height: 350)
-        myDatePicker.tintColor = .black
-        return myDatePicker
     }
     
     func createDatePickerView() {
@@ -367,6 +339,8 @@ class ViewController: BaseViewController {
     }
 }
 
+// MARK: TopicViewControllerEvent
+
 extension ViewController: TopicViewControllerEvent {
     func topic(_ viewController: TopicViewController, didSelectedItem: String) {
         guard let text = self.navigationItem.searchController?.searchBar.text,
@@ -376,7 +350,27 @@ extension ViewController: TopicViewControllerEvent {
         snapshot.deleteItems(coreDataStore.fetchTodo())
         switch filterText {
         case .All:
-            if self.navigationItem.searchController?.isActive ?? false {
+            setFilteredSnapshot(text, &snapshot, .All)
+        case .Today:
+            setFilteredSnapshot(text, &snapshot, .Today)
+        case .Week:
+            setFilteredSnapshot(text, &snapshot, .Week)
+        case .Month:
+            setFilteredSnapshot(text, &snapshot, .Month)
+        }
+        collectionViewDataSource.apply(snapshot)
+    }
+    
+    func setFilteredSnapshot(
+        _ text: String,
+        _ snapshot: inout NSDiffableDataSourceSnapshot<Section, Todo>,
+        _ filter: Filter)
+    {
+        guard let searchController = self.navigationItem.searchController else { return }
+        
+        switch filter {
+        case .All:
+            if searchController.isActive {
                 snapshot.appendItems(self.sort().filter { element in
                     let content = element.content ?? ""
                     return content.localizedCaseInsensitiveContains(text)
@@ -385,7 +379,7 @@ extension ViewController: TopicViewControllerEvent {
                 snapshot.appendItems(self.sort())
             }
         case .Today:
-            if self.navigationItem.searchController?.isActive ?? false {
+            if searchController.isActive {
                 snapshot.appendItems(filteredToday(self.sort()).filter { element in
                     let content = element.content ?? ""
                     return content.localizedCaseInsensitiveContains(text)
@@ -394,7 +388,7 @@ extension ViewController: TopicViewControllerEvent {
                 snapshot.appendItems(filteredToday(self.sort()))
             }
         case .Week:
-            if self.navigationItem.searchController?.isActive ?? false {
+            if searchController.isActive {
                 snapshot.appendItems(filteredWeek(self.sort()).filter { element in
                     let content = element.content ?? ""
                     return content.localizedCaseInsensitiveContains(text)
@@ -403,7 +397,7 @@ extension ViewController: TopicViewControllerEvent {
                 snapshot.appendItems(filteredWeek(self.sort()))
             }
         case .Month:
-            if self.navigationItem.searchController?.isActive ?? false {
+            if searchController.isActive {
                 snapshot.appendItems(filteredMonth(self.sort()).filter { element in
                     let content = element.content ?? ""
                     return content.localizedCaseInsensitiveContains(text)
@@ -412,10 +406,10 @@ extension ViewController: TopicViewControllerEvent {
                 snapshot.appendItems(filteredMonth(self.sort()))
             }
         }
-        collectionViewDataSource.apply(snapshot)
     }
-    
 }
+
+// MARK: UICollectionViewDelegate
 
 extension ViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -430,10 +424,10 @@ extension ViewController: UICollectionViewDelegate {
         collectionViewDataSource.apply(snapshot, animatingDifferences: true) {
             collectionView.deselectItem(at: indexPath, animated: true)
         }
-        
     }
-    
 }
+
+// MARK: UISearchResultsUpdating
 
 extension ViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
@@ -444,31 +438,22 @@ extension ViewController: UISearchResultsUpdating {
             self.addToDoButton.isHidden = true
             switch filterText {
             case .All:
-                filteredDataStore = self.sort().filter { element in
-                    let content = element.content ?? ""
-                    return content.localizedCaseInsensitiveContains(text)
-                }
+                updateSearchResultsCases(text, .All)
             case .Today:
-                filteredDataStore = filteredToday(self.sort()).filter { element in
-                    let content = element.content ?? ""
-                    return content.localizedCaseInsensitiveContains(text)
-                }
+                updateSearchResultsCases(text, .Today)
             case .Week:
-                filteredDataStore = filteredWeek(self.sort()).filter { element in
-                    let content = element.content ?? ""
-                    return content.localizedCaseInsensitiveContains(text)
-                }
+                updateSearchResultsCases(text, .Week)
             case .Month:
-                filteredDataStore = filteredMonth(self.sort()).filter { element in
-                    let content = element.content ?? ""
-                    return content.localizedCaseInsensitiveContains(text)
-                }
+                updateSearchResultsCases(text, .Month)
             }
+            
             var snapshot = collectionViewDataSource.snapshot()
             snapshot.deleteItems(coreDataStore.fetchTodo())
             snapshot.appendItems(filteredDataStore)
             collectionViewDataSource.apply(snapshot)
-        } else {
+            
+        }
+        else {
             self.addToDoButton.isHidden = false
             var snapshot = collectionViewDataSource.snapshot()
             snapshot.deleteItems(coreDataStore.fetchTodo())
@@ -485,7 +470,34 @@ extension ViewController: UISearchResultsUpdating {
             collectionViewDataSource.apply(snapshot)
         }
     }
+    
+    func updateSearchResultsCases(_ text: String, _ filter: Filter) {
+        switch filter {
+        case .All:
+            filteredDataStore = self.sort().filter { element in
+                let content = element.content ?? ""
+                return content.localizedCaseInsensitiveContains(text)
+            }
+        case .Today:
+            filteredDataStore = filteredToday(self.sort()).filter { element in
+                let content = element.content ?? ""
+                return content.localizedCaseInsensitiveContains(text)
+            }
+        case .Week:
+            filteredDataStore = filteredWeek(self.sort()).filter { element in
+                let content = element.content ?? ""
+                return content.localizedCaseInsensitiveContains(text)
+            }
+        case .Month:
+            filteredDataStore = filteredMonth(self.sort()).filter { element in
+                let content = element.content ?? ""
+                return content.localizedCaseInsensitiveContains(text)
+            }
+        }
+    }
 }
+
+// MARK: Extension ViewController - filteredArray, sortedArray
 
 extension ViewController {
     func filteredToday(_ array: [Todo]) -> [Todo] {
@@ -509,7 +521,7 @@ extension ViewController {
     func sort() -> [Todo] {
         var array = coreDataStore.fetchTodo()
         array.sort { current, next in
-            if current.fix && !next.fix {
+            if current.fix , !next.fix {
                 return true
             } else {
                 return false
