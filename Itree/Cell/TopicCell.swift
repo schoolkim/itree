@@ -24,8 +24,8 @@ class TopicCell: UICollectionViewCell {
         }
     }
     
-    func configureCell(itemIdentifier: String) {
-        titleLabel.text = itemIdentifier
+    func configureCell(itemIdentifier: Filter) {
+        titleLabel.text = itemIdentifier.title
     }
 
     override func awakeFromNib() {

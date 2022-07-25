@@ -8,7 +8,7 @@
 import UIKit
 
 protocol TopicViewControllerEvent: AnyObject {
-    func topic(_ viewController: TopicViewController, didSelectedItem: String)
+    func topic(_ viewController: TopicViewController, didSelectedItem: Filter)
 }
 
 // MARK: TopicViewController
@@ -16,20 +16,19 @@ protocol TopicViewControllerEvent: AnyObject {
 class TopicViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     
-    private var collectionDataSource: UICollectionViewDiffableDataSource<String, String>!
+    private var collectionDataSource: UICollectionViewDiffableDataSource<String, Filter>!
     weak var eventDelegate: TopicViewControllerEvent?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        collectionView.alwaysBounceVertical = false
         collectionView.delegate = self
         configureDataSource()
         configureCollectionViewLayout()
     }
 
     func configureDataSource() {
-        let topicCellRegistration = UICollectionView.CellRegistration<TopicCell, String>(cellNib: TopicCell.nib) { cell, indexPath, itemIdentifier in
+        let topicCellRegistration = UICollectionView.CellRegistration<TopicCell, Filter>(cellNib: TopicCell.nib) { cell, indexPath, itemIdentifier in
             cell.configureCell(itemIdentifier: itemIdentifier)
         }
         
@@ -52,7 +51,7 @@ class TopicViewController: UIViewController {
         collectionView.collectionViewLayout = UICollectionViewCompositionalLayout(section: sectionLayout)
     }
     
-    func applyInitialData(items: [String]) {
+    func applyInitialData(items: [Filter]) {
         var snapshot = collectionDataSource.snapshot()
         snapshot.appendSections(["topic"])
         snapshot.appendItems(items, toSection: "topic")

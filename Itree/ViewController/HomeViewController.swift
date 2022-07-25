@@ -9,7 +9,7 @@ import UIKit
 
 // MARK: ViewController
 
-class ViewController: BaseViewController {
+class HomeViewController: BaseViewController {
     @IBOutlet weak var addToDoButton: UIButton!
     @IBOutlet weak var bottomStackView: UIStackView!
     @IBOutlet weak var collectionView: UICollectionView!
@@ -17,44 +17,41 @@ class ViewController: BaseViewController {
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var topicContainerView: UIView!
     
-    // MARK: Public
+    // MARK: Internal
     
     weak var topicViewController: TopicViewController?
     var collectionViewDataSource: UICollectionViewDiffableDataSource<Section, Todo>!
-    var selectedString: String!
+    var selectedFilter: Filter!
     var contentConfiguration: UIListContentConfiguration!
     var addTodoButtonBottomConstraint: NSLayoutConstraint?
     var coreDataStore = CoreDataStore.shared
     var filteredDataStore = [Todo]()
-    
-    // MARK: Static
-    
-    static var date: Date!
-    static var dateString: String!
-    
-    // MARK: Private
-    
-    private(set) static var shared: ViewController!
+    var date: Date!
     
     var isFiltering: Bool {
-        let searchController = self.navigationItem.searchController
-        let isActive = searchController?.isActive ?? false
-        let hasText = searchController?.searchBar.text?.isEmpty == false
+        guard let searchController = self.navigationItem.searchController,
+              let searchBarText = self.navigationItem.searchController?.searchBar.text else { return false }
+        
+        let isActive = searchController.isActive
+        let hasText = searchBarText.isEmpty == false
         return isActive && hasText
     }
     
-    var topicDataStore: [String] = {
-        var strArray = [String]()
-        Filter.allCases.forEach { element in
-            strArray.append(element.rawValue)
-        }
-        return strArray
+    var topicDataStore: [Filter] = {
+        Filter.allCases
     }()
     
     var collectionViewCellSecondaryTextFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .none
         formatter.dateFormat = "yyyy년 MM월 dd일 HH시 mm분"
+        return formatter
+    }()
+    
+    var dateLabelTextFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .none
+        formatter.dateFormat = "yyyy/MM/dd - HH:mm "
         return formatter
     }()
     
@@ -67,7 +64,6 @@ class ViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        ViewController.shared = self
         
         let addTodoButtonBottomKeyboardConstraint = addToDoButton.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor, constant: -8)
         addTodoButtonBottomKeyboardConstraint.priority = .defaultLow
@@ -98,14 +94,14 @@ class ViewController: BaseViewController {
         snapshot.appendItems(sort())
         collectionViewDataSource.apply(snapshot)
         
-        selectedString = "All"
+        selectedFilter = .all
         textField.placeholder = "날짜와 시간을 선택해주세요"
     }
     
     @IBSegueAction func segueTopicViewController(_ coder: NSCoder) -> TopicViewController? {
         let viewController = TopicViewController(coder: coder)
         viewController?.eventDelegate = self
-        self.topicViewController = viewController
+        topicViewController = viewController
         return viewController
     }
     
@@ -115,18 +111,22 @@ class ViewController: BaseViewController {
             if dateLabel.text == "" {
                 dateLabel.isHidden = true
             }
-            UIView.animate(withDuration: 0.5) {
+            UIView.animate(withDuration: 0.5) { [weak self] in
+                guard let self = self else { return }
+                
                 self.addToDoButton.transform = .init(rotationAngle: 45 / 180 * .pi)
             }
         }
         else {
             textField.resignFirstResponder()
-            UIView.animate(withDuration: 0.5) {
+            UIView.animate(withDuration: 0.5) { [weak self] in
+                guard let self = self else { return }
+                
                 self.addToDoButton.transform = .identity
             }
-            self.dateLabel.text = ""
-            self.textField.text = ""
-            self.textField.placeholder = "날짜와 시간을 선택해주세요"
+            dateLabel.text = ""
+            textField.text = ""
+            textField.placeholder = "날짜와 시간을 선택해주세요"
         }
     }
     
@@ -134,58 +134,58 @@ class ViewController: BaseViewController {
 
     @objc
     func tappedDateButton() {
-        showDatePickerSheetPresentationController()
+        showDatePickerSheetPresentationController(context: .datePicker)
     }
     
     @objc
     func tappedTodayButton() {
-        showTodayPickerSheetPresentationController()
+        showDatePickerSheetPresentationController(context: .todayPicker)
     }
     
     @objc
     func tappedDoneButton() {
-        guard let filterText = Filter(rawValue: selectedString) else { return }
-        
-        if self.dateLabel.text == "" {
+        if dateLabel.text == "" {
             let alert = UIAlertController(title: "날짜와 시간을 선택해주세요", message: "", preferredStyle: .alert)
             let cancel = UIAlertAction(title: "확인", style: .cancel)
             alert.addAction(cancel)
-            self.present(alert, animated: false)
+            present(alert, animated: false)
             return
         }
-        else if self.textField.text == "" {
+        else if textField.text == "" {
             textField.text = ""
             let alert = UIAlertController(title: "할 일을 입력해주세요", message: "", preferredStyle: .alert)
             let cancel = UIAlertAction(title: "확인", style: .cancel)
             alert.addAction(cancel)
-            self.present(alert, animated: false)
+            present(alert, animated: false)
             return
         }
         
-        let resultString = self.textField.text
-        self.coreDataStore.createTodo(text: resultString ?? "", date: ViewController.date)
+        let resultString = textField.text
+        coreDataStore.createTodo(text: resultString ?? "", date: date)
         textField.resignFirstResponder()
-        self.textField.text = ""
-        self.dateLabel.text = ""
-        self.textField.placeholder = "날짜와 시간을 선택해주세요"
-        UIView.animate(withDuration: 0.5) {
+        textField.text = ""
+        dateLabel.text = ""
+        textField.placeholder = "날짜와 시간을 선택해주세요"
+        UIView.animate(withDuration: 0.5) { [weak self] in
+            guard let self = self else { return }
+            
             self.addToDoButton.transform = .identity
         }
-        configureSnapshot(filterText)
+        configureSnapshot(selectedFilter)
     }
     
-    func configureSnapshot(_ selectedString: Filter) {
+    func configureSnapshot(_ selectedFilter: Filter) {
         var snapshot = collectionViewDataSource.snapshot()
         snapshot.deleteItems(coreDataStore.fetchTodo())
-        switch selectedString {
-        case .All:
-            snapshot.appendItems(self.sort())
-        case .Today:
-            snapshot.appendItems(filteredToday(self.sort()))
-        case .Week:
-            snapshot.appendItems(filteredWeek(self.sort()))
-        case .Month:
-            snapshot.appendItems(filteredMonth(self.sort()))
+        switch selectedFilter {
+        case .all:
+            snapshot.appendItems(sort())
+        case .today:
+            snapshot.appendItems(filteredToday(sort()))
+        case .week:
+            snapshot.appendItems(filteredWeek(sort()))
+        case .month:
+            snapshot.appendItems(filteredMonth(sort()))
         }
         collectionViewDataSource.apply(snapshot)
     }
@@ -202,18 +202,13 @@ class ViewController: BaseViewController {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.hidesNavigationBarDuringPresentation = false
         searchController.searchResultsUpdater = self
-        self.navigationItem.searchController = searchController
-        self.navigationItem.hidesSearchBarWhenScrolling = false
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
     }
     
-    func showDatePickerSheetPresentationController() {
-        let navigationController = UINavigationController(rootViewController: DatePickerSheetPresentationController())
-        self.present(navigationController, animated: true, completion: nil)
-    }
-    
-    func showTodayPickerSheetPresentationController() {
-        let navigationController = UINavigationController(rootViewController: TodayPickerSheetPresentationController())
-        self.present(navigationController, animated: true, completion: nil)
+    func showDatePickerSheetPresentationController(context: Context) {
+        let navigationController = UINavigationController(rootViewController: DatePickerSheetPresentationController(context: context))
+        present(navigationController, animated: true, completion: nil)
     }
     
     func configureCollectionViewLayout() {
@@ -341,22 +336,21 @@ class ViewController: BaseViewController {
 
 // MARK: TopicViewControllerEvent
 
-extension ViewController: TopicViewControllerEvent {
-    func topic(_ viewController: TopicViewController, didSelectedItem: String) {
-        guard let text = self.navigationItem.searchController?.searchBar.text,
-              let filterText = Filter(rawValue: didSelectedItem) else { return }
+extension HomeViewController: TopicViewControllerEvent {
+    func topic(_ viewController: TopicViewController, didSelectedItem: Filter) {
+        guard let text = self.navigationItem.searchController?.searchBar.text else { return }
         
         var snapshot = collectionViewDataSource.snapshot()
         snapshot.deleteItems(coreDataStore.fetchTodo())
-        switch filterText {
-        case .All:
-            setFilteredSnapshot(text, &snapshot, .All)
-        case .Today:
-            setFilteredSnapshot(text, &snapshot, .Today)
-        case .Week:
-            setFilteredSnapshot(text, &snapshot, .Week)
-        case .Month:
-            setFilteredSnapshot(text, &snapshot, .Month)
+        switch didSelectedItem {
+        case .all:
+            setFilteredSnapshot(text, &snapshot, .all)
+        case .today:
+            setFilteredSnapshot(text, &snapshot, .today)
+        case .week:
+            setFilteredSnapshot(text, &snapshot, .week)
+        case .month:
+            setFilteredSnapshot(text, &snapshot, .month)
         }
         collectionViewDataSource.apply(snapshot)
     }
@@ -369,7 +363,7 @@ extension ViewController: TopicViewControllerEvent {
         guard let searchController = self.navigationItem.searchController else { return }
         
         switch filter {
-        case .All:
+        case .all:
             if searchController.isActive {
                 snapshot.appendItems(self.sort().filter { element in
                     let content = element.content ?? ""
@@ -378,7 +372,7 @@ extension ViewController: TopicViewControllerEvent {
             } else {
                 snapshot.appendItems(self.sort())
             }
-        case .Today:
+        case .today:
             if searchController.isActive {
                 snapshot.appendItems(filteredToday(self.sort()).filter { element in
                     let content = element.content ?? ""
@@ -387,7 +381,7 @@ extension ViewController: TopicViewControllerEvent {
             } else {
                 snapshot.appendItems(filteredToday(self.sort()))
             }
-        case .Week:
+        case .week:
             if searchController.isActive {
                 snapshot.appendItems(filteredWeek(self.sort()).filter { element in
                     let content = element.content ?? ""
@@ -396,7 +390,7 @@ extension ViewController: TopicViewControllerEvent {
             } else {
                 snapshot.appendItems(filteredWeek(self.sort()))
             }
-        case .Month:
+        case .month:
             if searchController.isActive {
                 snapshot.appendItems(filteredMonth(self.sort()).filter { element in
                     let content = element.content ?? ""
@@ -411,7 +405,7 @@ extension ViewController: TopicViewControllerEvent {
 
 // MARK: UICollectionViewDelegate
 
-extension ViewController: UICollectionViewDelegate {
+extension HomeViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let selectedTodo = collectionViewDataSource.itemIdentifier(for: indexPath) else { return }
         
@@ -429,22 +423,22 @@ extension ViewController: UICollectionViewDelegate {
 
 // MARK: UISearchResultsUpdating
 
-extension ViewController: UISearchResultsUpdating {
+extension HomeViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         guard let text = self.navigationItem.searchController?.searchBar.text,
-              let filterText = Filter(rawValue: selectedString) else { return }
+              let selectedFilter = self.selectedFilter else { return }
         
         if self.isFiltering || self.navigationItem.searchController?.isActive ?? false {
             self.addToDoButton.isHidden = true
-            switch filterText {
-            case .All:
-                updateSearchResultsCases(text, .All)
-            case .Today:
-                updateSearchResultsCases(text, .Today)
-            case .Week:
-                updateSearchResultsCases(text, .Week)
-            case .Month:
-                updateSearchResultsCases(text, .Month)
+            switch selectedFilter {
+            case .all:
+                updateSearchResultsCases(text, .all)
+            case .today:
+                updateSearchResultsCases(text, .today)
+            case .week:
+                updateSearchResultsCases(text, .week)
+            case .month:
+                updateSearchResultsCases(text, .month)
             }
             
             var snapshot = collectionViewDataSource.snapshot()
@@ -457,14 +451,14 @@ extension ViewController: UISearchResultsUpdating {
             self.addToDoButton.isHidden = false
             var snapshot = collectionViewDataSource.snapshot()
             snapshot.deleteItems(coreDataStore.fetchTodo())
-            switch filterText {
-            case .All:
+            switch selectedFilter {
+            case .all:
                 snapshot.appendItems(self.sort())
-            case .Today:
+            case .today:
                 snapshot.appendItems(filteredToday(self.sort()))
-            case .Week:
+            case .week:
                 snapshot.appendItems(filteredWeek(self.sort()))
-            case .Month:
+            case .month:
                 snapshot.appendItems(filteredMonth(self.sort()))
             }
             collectionViewDataSource.apply(snapshot)
@@ -473,22 +467,22 @@ extension ViewController: UISearchResultsUpdating {
     
     func updateSearchResultsCases(_ text: String, _ filter: Filter) {
         switch filter {
-        case .All:
+        case .all:
             filteredDataStore = self.sort().filter { element in
                 let content = element.content ?? ""
                 return content.localizedCaseInsensitiveContains(text)
             }
-        case .Today:
+        case .today:
             filteredDataStore = filteredToday(self.sort()).filter { element in
                 let content = element.content ?? ""
                 return content.localizedCaseInsensitiveContains(text)
             }
-        case .Week:
+        case .week:
             filteredDataStore = filteredWeek(self.sort()).filter { element in
                 let content = element.content ?? ""
                 return content.localizedCaseInsensitiveContains(text)
             }
-        case .Month:
+        case .month:
             filteredDataStore = filteredMonth(self.sort()).filter { element in
                 let content = element.content ?? ""
                 return content.localizedCaseInsensitiveContains(text)
@@ -499,7 +493,7 @@ extension ViewController: UISearchResultsUpdating {
 
 // MARK: Extension ViewController - filteredArray, sortedArray
 
-extension ViewController {
+extension HomeViewController {
     func filteredToday(_ array: [Todo]) -> [Todo] {
         return array.filter {
             ($0.todoAt?.day == Date().day && $0.todoAt?.month == Date().month) || $0.fix

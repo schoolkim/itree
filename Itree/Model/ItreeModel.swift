@@ -11,11 +11,42 @@ enum Section {
     case Main
 }
 
-enum Filter: String, CaseIterable {
-    case All
-    case Today
-    case Week = "This Week"
-    case Month = "This Month"
+enum Filter: CaseIterable {
+    case all, today, week, month
+    
+    var title: String {
+        switch self {
+        case .all: return "All"
+        case .today: return "Today"
+        case .week: return "This Week"
+        case .month: return "This Month"
+        }
+    }
+}
+
+enum Context {
+    case todayPicker, datePicker
+    
+    var title: String {
+        switch self {
+        case .todayPicker: return "Time"
+        case .datePicker: return "Date"
+        }
+    }
+    
+    var datePicker: UIDatePicker {
+        let myDatePicker: UIDatePicker = UIDatePicker()
+        myDatePicker.timeZone = NSTimeZone.local
+        myDatePicker.tintColor = .black
+        switch self {
+        case .todayPicker:
+            myDatePicker.datePickerMode = .time
+            return myDatePicker
+        case .datePicker:
+            myDatePicker.preferredDatePickerStyle = .inline
+            return myDatePicker
+        }
+    }
 }
 
 extension Date {
@@ -50,5 +81,18 @@ extension String {
         attributeString.addAttribute(.strikethroughStyle, value: NSUnderlineStyle.single.rawValue, range: NSMakeRange(0, attributeString.length))
         attributeString.addAttribute(.foregroundColor, value: UIColor.gray, range: NSMakeRange(0, attributeString.length))
         return attributeString
+    }
+}
+
+extension UIViewController {
+    class var identifier: String {
+        return String(describing: Self.self)
+    }
+
+    class func create() -> Self {
+        UIStoryboard(name: "Main", bundle: .main)
+            .instantiateViewController(identifier: identifier) { coder in
+                Self.init(coder: coder)
+            }
     }
 }

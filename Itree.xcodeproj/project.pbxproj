@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		4D1787A928338AFD00DAB899 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1787A828338AFD00DAB899 /* AppDelegate.swift */; };
 		4D1787AB28338AFD00DAB899 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1787AA28338AFD00DAB899 /* SceneDelegate.swift */; };
-		4D1787AD28338AFD00DAB899 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1787AC28338AFD00DAB899 /* ViewController.swift */; };
+		4D1787AD28338AFD00DAB899 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1787AC28338AFD00DAB899 /* HomeViewController.swift */; };
 		4D1787B028338AFD00DAB899 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D1787AE28338AFD00DAB899 /* Main.storyboard */; };
 		4D1787B228338AFD00DAB899 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D1787B128338AFD00DAB899 /* Assets.xcassets */; };
 		4D1787B528338AFD00DAB899 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D1787B328338AFD00DAB899 /* LaunchScreen.storyboard */; };
@@ -17,7 +17,6 @@
 		4D1B35E8283F6C2F00FBB3BF /* TopicViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B35E7283F6C2F00FBB3BF /* TopicViewController.swift */; };
 		4D1B35EC283F6CCE00FBB3BF /* TopicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1B35EA283F6CCE00FBB3BF /* TopicCell.swift */; };
 		4D1B35ED283F6CCE00FBB3BF /* TopicCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D1B35EB283F6CCE00FBB3BF /* TopicCell.xib */; };
-		4D5CFDA32886960B00B06DE9 /* TodayPickerSheetPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D5CFDA22886960B00B06DE9 /* TodayPickerSheetPresentationController.swift */; };
 		4D5CFDA52886963500B06DE9 /* DatePickerSheetPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D5CFDA42886963500B06DE9 /* DatePickerSheetPresentationController.swift */; };
 		4DD8920D288569F20092C81A /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DD8920C288569F20092C81A /* BaseViewController.swift */; };
 		4DF5006628641D9600CF37B7 /* Todo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4DF5006428641D9600CF37B7 /* Todo.xcdatamodeld */; };
@@ -31,7 +30,7 @@
 		4D1787A528338AFD00DAB899 /* Itree.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Itree.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D1787A828338AFD00DAB899 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4D1787AA28338AFD00DAB899 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		4D1787AC28338AFD00DAB899 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		4D1787AC28338AFD00DAB899 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		4D1787AF28338AFD00DAB899 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4D1787B128338AFD00DAB899 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4D1787B428338AFD00DAB899 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -40,7 +39,6 @@
 		4D1B35E7283F6C2F00FBB3BF /* TopicViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicViewController.swift; sourceTree = "<group>"; };
 		4D1B35EA283F6CCE00FBB3BF /* TopicCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicCell.swift; sourceTree = "<group>"; };
 		4D1B35EB283F6CCE00FBB3BF /* TopicCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TopicCell.xib; sourceTree = "<group>"; };
-		4D5CFDA22886960B00B06DE9 /* TodayPickerSheetPresentationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPickerSheetPresentationController.swift; sourceTree = "<group>"; };
 		4D5CFDA42886963500B06DE9 /* DatePickerSheetPresentationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheetPresentationController.swift; sourceTree = "<group>"; };
 		4DD8920C288569F20092C81A /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		4DF5006528641D9600CF37B7 /* Todo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Todo.xcdatamodel; sourceTree = "<group>"; };
@@ -108,11 +106,10 @@
 		4DD8920B288569A70092C81A /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				4D1787AC28338AFD00DAB899 /* ViewController.swift */,
+				4D1787AC28338AFD00DAB899 /* HomeViewController.swift */,
 				4D1B35E7283F6C2F00FBB3BF /* TopicViewController.swift */,
 				4DD8920C288569F20092C81A /* BaseViewController.swift */,
 				4D5CFDA42886963500B06DE9 /* DatePickerSheetPresentationController.swift */,
-				4D5CFDA22886960B00B06DE9 /* TodayPickerSheetPresentationController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -210,9 +207,8 @@
 			files = (
 				4D5CFDA52886963500B06DE9 /* DatePickerSheetPresentationController.swift in Sources */,
 				4DF5006C28641EE800CF37B7 /* CoreDataStore.swift in Sources */,
-				4D1787AD28338AFD00DAB899 /* ViewController.swift in Sources */,
+				4D1787AD28338AFD00DAB899 /* HomeViewController.swift in Sources */,
 				4DD8920D288569F20092C81A /* BaseViewController.swift in Sources */,
-				4D5CFDA32886960B00B06DE9 /* TodayPickerSheetPresentationController.swift in Sources */,
 				4D1787A928338AFD00DAB899 /* AppDelegate.swift in Sources */,
 				4DF5006928641E5F00CF37B7 /* Todo+CoreDataClass.swift in Sources */,
 				4D1B35E8283F6C2F00FBB3BF /* TopicViewController.swift in Sources */,
