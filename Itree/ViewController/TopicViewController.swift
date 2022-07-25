@@ -8,31 +8,27 @@
 import UIKit
 
 protocol TopicViewControllerEvent: AnyObject {
-    func topic(_ viewController: TopicViewController, didSelectedItem: String)
+    func topic(_ viewController: TopicViewController, didSelectedItem: Filter)
 }
 
+// MARK: TopicViewController
+
 class TopicViewController: UIViewController {
-    
     @IBOutlet weak var collectionView: UICollectionView!
     
-    private var collectionDataSource: UICollectionViewDiffableDataSource<String, String>!
-    
+    private var collectionDataSource: UICollectionViewDiffableDataSource<String, Filter>!
     weak var eventDelegate: TopicViewControllerEvent?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        collectionView.alwaysBounceVertical = false
-        
         collectionView.delegate = self
         configureDataSource()
         configureCollectionViewLayout()
-
     }
 
-    
     func configureDataSource() {
-        let topicCellRegistration = UICollectionView.CellRegistration<TopicCell, String>(cellNib: TopicCell.nib) { cell, indexPath, itemIdentifier in
+        let topicCellRegistration = UICollectionView.CellRegistration<TopicCell, Filter>(cellNib: TopicCell.nib) { cell, indexPath, itemIdentifier in
             cell.configureCell(itemIdentifier: itemIdentifier)
         }
         
@@ -43,9 +39,9 @@ class TopicViewController: UIViewController {
     }
     
     func configureCollectionViewLayout() {
-        let itemLayoutSize = NSCollectionLayoutSize(widthDimension: .estimated(128), heightDimension: .fractionalHeight(1.0))
+        let itemLayoutSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
         let itemLayout = NSCollectionLayoutItem(layoutSize: itemLayoutSize)
-        let groupLayoutSize = NSCollectionLayoutSize(widthDimension: .estimated(128), heightDimension: .absolute(44))
+        let groupLayoutSize = NSCollectionLayoutSize(widthDimension: .estimated(88), heightDimension: .absolute(44))
         let groupLayout = NSCollectionLayoutGroup.horizontal(layoutSize: groupLayoutSize, subitems: [itemLayout])
         let sectionLayout = NSCollectionLayoutSection(group: groupLayout)
         sectionLayout.orthogonalScrollingBehavior = .continuous
@@ -55,7 +51,7 @@ class TopicViewController: UIViewController {
         collectionView.collectionViewLayout = UICollectionViewCompositionalLayout(section: sectionLayout)
     }
     
-    func applyInitialData(items: [String]) {
+    func applyInitialData(items: [Filter]) {
         var snapshot = collectionDataSource.snapshot()
         snapshot.appendSections(["topic"])
         snapshot.appendItems(items, toSection: "topic")
@@ -63,8 +59,9 @@ class TopicViewController: UIViewController {
             self?.collectionView.selectItem(at: IndexPath(item: 0, section: 0), animated: false, scrollPosition: [])
         }
     }
-    
 }
+
+// MARK: UICollectionViewDelegate
 
 extension TopicViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -72,18 +69,5 @@ extension TopicViewController: UICollectionViewDelegate {
         if let itemIdentifier = collectionDataSource.itemIdentifier(for: indexPath) {
             eventDelegate?.topic(self, didSelectedItem: itemIdentifier)
         }
-        
     }
 }
-
-extension UIColor {
-    class var random: UIColor {
-        UIColor(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1)
-    }
-}
-
-
-    
-
-    
-
