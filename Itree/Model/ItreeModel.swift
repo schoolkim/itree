@@ -90,9 +90,10 @@ extension UIViewController {
     }
 
     class func create() -> Self {
-        UIStoryboard(name: "Main", bundle: .main)
-            .instantiateViewController(identifier: identifier) { coder in
-                Self.init(coder: coder)
-            }
+        UIStoryboard(name: "Main", bundle: .main).instantiateViewController(identifier: identifier) { coder in
+            Self.init(coder: coder)
+        }
     }
 }
+
+

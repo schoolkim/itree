@@ -8,6 +8,10 @@
 import Foundation
 import UIKit
 
+protocol UIDatePickerSheetProtocol: AnyObject {
+    func tappedOKButton(_ viewController: DatePickerSheetPresentationController)
+}
+
 // MARK: DatePickerSheetPresentationController
 
 class DatePickerSheetPresentationController: UIViewController {
@@ -21,10 +25,12 @@ class DatePickerSheetPresentationController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    var date: Date!
     var datePicker: UIDatePicker!
-    var dateString: String!
     var okButtonClicked: Bool = false
     var context: Context!
+    var homeViewController: HomeViewController?
+    var delegate: UIDatePickerSheetProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,6 +38,7 @@ class DatePickerSheetPresentationController: UIViewController {
         view.backgroundColor = .systemBackground
         title = context.title
         datePicker = context.datePicker
+        homeViewController = HomeViewController.create()
         
         view.addSubview(datePicker)
         datePicker.translatesAutoresizingMaskIntoConstraints = false
@@ -46,18 +53,6 @@ class DatePickerSheetPresentationController: UIViewController {
         addNavigationBarButtonItem()
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        guard let dateLabel = HomeViewController.create().dateLabel,
-              let textField = HomeViewController.create().textField else { return }
-
-        if self.okButtonClicked {
-            dateLabel.isHidden = false
-            dateLabel.text = dateString
-            textField.placeholder = "할 일을 입력해주세요"
-            okButtonClicked = false
-        }
-    }
-    
     private func setupSheet() {
         isModalInPresentation = true
         if let sheet = sheetPresentationController {
@@ -70,13 +65,13 @@ class DatePickerSheetPresentationController: UIViewController {
     }
     
     private func addNavigationBarButtonItem() {
-        let viewController = HomeViewController.create()
         let completedButton = UIBarButtonItem(title: "OK", primaryAction: .init(handler: { [weak self] _ in
             guard let self = self else { return }
             
             self.okButtonClicked = true
-            viewController.date = self.datePicker.date
+            self.date = self.datePicker.date
             self.dismiss(animated: true, completion: nil)
+            self.delegate?.tappedOKButton(self)
         }))
         
         let cancelButton = UIBarButtonItem(title: "Cancel", primaryAction: .init(handler: { [weak self] _ in
