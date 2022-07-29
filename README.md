@@ -20,9 +20,72 @@ Itree는 사용자의 일정을 관리할 수 있는 todoList 어플리케이션
 ## Tech Stack
 * Swift 5.6
 * Core Data FrameWork
+</br>
 
 <a name="basic-concept"/>
 
 ## Basic Concept
 <p align="center"><img width="1178" alt="스크린샷 2022-07-27 오후 7 06 14" src="https://user-images.githubusercontent.com/107173548/181224182-d903bc75-48db-49ea-a377-92358b90c1eb.png"></p>
-기본적으로 MVC 패턴을 활용하여 View로부터 UserAction이 발생하면 Controller의 동작을 통해 Model을 Update되고 Model의 Update가 완료되면 Controller를 통해 다시 Update된 사항이 View를 통해 사용자에게 보여지게 됩니다.
+</br>
+기본적으로 MVC 패턴을 활용하여 View로부터 UserAction이 발생하면 Controller의 동작을 통해 Model을 Update되고 Model의 Update가 완료되면</br> 
+Controller를 통해 다시 Update된 사항이 View를 통해 사용자에게 보여지게 됩니다.
+</br>
+</br>
+</br>
+
+```
+@objc
+func tappedDoneButton() {
+  ...
+  coreDataStore.createTodo()
+  ...
+}
+
+func createTodo() {
+  ...
+}
+```
+</br>
+</br>
+View를 통해서 tap 액션이 발생하면 Controller의 tapped 함수를 호출해서 coreData Model의 데이터가 update되고 View를 통해 보여지게 됩니다.
+</br>
+
+<a name="simulation"/>
+
+## Simulation
+### 1. Add Todo
+</br>
+<p>
+<img src="https://im.ezgif.com/tmp/ezgif-1-f80dabcc2d.gif" height=400 width=250>
+</p>
+</br>
+Add 버튼을 tap하여 calendar에서 날짜를 선택 후 일정을 입력하고 done 버튼을 누르면 리스트에 일정을 등록할 수 있습니다.
+</br>
+
+### 2. Filtering Todo
+</br>
+<p>
+<img src="https://im.ezgif.com/tmp/ezgif-1-65d26888d5.gif" height=400 width=250>
+</p>
+</br>
+각 필터별로 일정들을 filtering할 수 있습니다.
+</br>
+
+### 3. Pinned and completed Todo
+</br>
+<p>
+<img src="https://im.ezgif.com/tmp/ezgif-1-781e87de77.gif" height=400 width=250>
+</p>
+</br>
+왼쪽으로 swipe하여 일정을 pinned 할 수 있고, 일정을 tap하면 completed 유무를 표시할 수 있습니다.</br>
+Pinned된 일정은 날짜가 지나도 사라지지 않고, list 상단에 고정되게 되며 Everyday 일정으로 변경됩니다.
+</br>
+
+### 4. Search and Delete Todo
+</br>
+<p>
+<img src="https://im.ezgif.com/tmp/ezgif-1-e7079a9e83.gif" height=400 width=250>
+</p>
+</br>
+상단에 search bar를 사용하여 search를 할 수 있고 왼쪽으로 swipe하여 delete 버튼을 tap하게 되면 </br>
+일정을 list에서 삭제할 수 있습니다.
