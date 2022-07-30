@@ -20,7 +20,7 @@ Itree는 사용자의 일정을 관리할 수 있는 todoList 어플리케이션
 
 ## Tech Stack
 * Swift 5.6
-* Core Data FrameWork
+* Core Data Framework
 </br>
 
 <a name="basic-concept"/>
