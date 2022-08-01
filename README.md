@@ -69,7 +69,10 @@ coreData Model의 데이터가 update되고 View를 통해 보여지게 됩니�
 <img src="https://user-images.githubusercontent.com/107173548/182122923-5d220969-693f-484c-a196-ddba78b8f437.gif" height=400 width=250>
 </p>
 </br>
-Add 버튼을 tap하여 calendar에서 날짜를 선택 후 일정을 입력하고 done 버튼을 누르면 리스트에 일정을 등록할 수 있습니다.
+Add 버튼을 tap하여 calendar에서 날짜를 선택 후 일정을 입력하고</br> 
+done 버튼을 누르면 리스트에 일정을 등록할 수 있습니다.</br>
+버튼을 탭한 뒤 키보드 위 위치한 날짜와 시간을 선택할 수 있는 </br>
+캘린더 버튼을 통해 날짜와 시간을 선택하고 할 일을 입력합니다. 
 </br>
 
 ### 2. Filtering Todo
@@ -79,7 +82,8 @@ Add 버튼을 tap하여 calendar에서 날짜를 선택 후 일정을 입력하�
 </p>
 
 </br>
-각 필터별로 일정들을 filtering할 수 있습니다.
+각 필터별로 일정들을 filtering할 수 있습니다.</br>
+필터는 4가지로, 전체, 오늘해야할 일정, 이번 주 일정, 이번 달 일정 순입니다.
 </br>
 
 ### 3. Pinned and completed Todo
@@ -88,8 +92,11 @@ Add 버튼을 tap하여 calendar에서 날짜를 선택 후 일정을 입력하�
 <img src="https://user-images.githubusercontent.com/107173548/182125413-f58ea467-25ab-420c-857f-0d4f0aa4932b.gif" height=400 width=250>
 </p>
 </br>
-왼쪽으로 swipe하여 일정을 pinned 할 수 있고, 일정을 tap하면 completed 유무를 표시할 수 있습니다.</br>
-Pinned된 일정은 날짜가 지나도 사라지지 않고, list 상단에 고정되게 되며 Everyday 일정으로 변경됩니다.
+왼쪽으로 swipe하여 일정을 pinned 할 수 있고, </br>
+일정을 tap하면 completed 유무를 표시할 수 있습니다.</br>
+원하는 일정을 왼쪽으로 밀면 고정 할 수 있는 버튼이 생기며</br>
+상단에 고정한 일정은 매일 해야할 일정으로 변경되고</br>
+완료한 일정은 해당 일정을 탭하여 완료 여부를 표시할 수 있습니다.
 </br>
 
 ### 4. Search and Delete Todo
@@ -98,5 +105,6 @@ Pinned된 일정은 날짜가 지나도 사라지지 않고, list 상단에 고�
 <img src="https://user-images.githubusercontent.com/107173548/182126019-614d62de-f34d-4d69-88e5-e2f86a2b40b7.gif" height=400 width=250>
 </p>
 </br>
-상단에 search bar를 사용하여 search를 할 수 있고 왼쪽으로 swipe하여 delete 버튼을 tap하게 되면 </br>
-일정을 list에서 삭제할 수 있습니다.
+일정을 삭제할 수 있고 일정을 검색할 수 있습니다.</br>
+원하는 일정을 왼쪽으로 밀어 삭제 버튼을 탭할 수 있으며</br>
+화면 상단에 위치한 검색 바에서 검색 기능을 사용할 수 있습니다.
