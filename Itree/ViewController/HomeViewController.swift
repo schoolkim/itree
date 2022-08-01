@@ -79,7 +79,6 @@ class HomeViewController: BaseViewController {
         dateLabel.textColor = .label
         dateLabel.font = UIFont.boldSystemFont(ofSize: 15)
         dateLabel.text = ""
-        textField.delegate = self
         
         addToDoButton.layer.cornerRadius = 0.5 * addToDoButton.bounds.width
         addToDoButton.clipsToBounds = true
@@ -288,6 +287,9 @@ class HomeViewController: BaseViewController {
             
             // TODO: fix된 상태로 completed로 바꾼 후 unfix하고 completed 풀면 strikeThrough 적용됨
             
+            self.contentConfiguration.text = nil
+            self.contentConfiguration.attributedText = nil
+            
             if itemIdentifier.completed {
                 self.contentConfiguration.attributedText = itemIdentifier.content?.strikeThrough()
             }
@@ -410,7 +412,7 @@ extension HomeViewController: UICollectionViewDelegate {
         coreDataStore.saveContext()
         
         var snapshot = collectionViewDataSource.snapshot()
-        snapshot.reconfigureItems([selectedTodo])
+        snapshot.reloadItems([selectedTodo])
         collectionViewDataSource.apply(snapshot, animatingDifferences: true) {
             collectionView.deselectItem(at: indexPath, animated: true)
         }
@@ -476,18 +478,6 @@ extension HomeViewController: UISearchResultsUpdating {
                 return content.localizedCaseInsensitiveContains(text)
             }
         }
-    }
-}
-
-// MARK: Extension ViewController - UITextFieldDelegate
-
-extension HomeViewController: UITextFieldDelegate {
-    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        return true
-    }
-    
-    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-        return true
     }
 }
 
