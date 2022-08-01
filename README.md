@@ -66,7 +66,7 @@ coreData Model의 데이터가 update되고 View를 통해 보여지게 됩니�
 ### 1. Add Todo
 </br>
 <p>
-<img src="https://im3.ezgif.com/tmp/ezgif-3-3c1a3f321e.gif" height=400 width=250>
+<img src="https://user-images.githubusercontent.com/107173548/182122923-5d220969-693f-484c-a196-ddba78b8f437.gif" height=400 width=250>
 </p>
 </br>
 Add 버튼을 tap하여 calendar에서 날짜를 선택 후 일정을 입력하고 done 버튼을 누르면 리스트에 일정을 등록할 수 있습니다.
@@ -75,8 +75,9 @@ Add 버튼을 tap하여 calendar에서 날짜를 선택 후 일정을 입력하�
 ### 2. Filtering Todo
 </br>
 <p>
-<img src="https://im3.ezgif.com/tmp/ezgif-3-c9b580af52.gif" height=400 width=250>
+<img src="https://user-images.githubusercontent.com/107173548/182124662-12407a76-7175-43f4-8637-22e635635c94.gif" height=400 width=250>
 </p>
+
 </br>
 각 필터별로 일정들을 filtering할 수 있습니다.
 </br>
@@ -84,7 +85,7 @@ Add 버튼을 tap하여 calendar에서 날짜를 선택 후 일정을 입력하�
 ### 3. Pinned and completed Todo
 </br>
 <p>
-<img src="https://im3.ezgif.com/tmp/ezgif-3-86376a278a.gif" height=400 width=250>
+<img src="https://user-images.githubusercontent.com/107173548/182125413-f58ea467-25ab-420c-857f-0d4f0aa4932b.gif" height=400 width=250>
 </p>
 </br>
 왼쪽으로 swipe하여 일정을 pinned 할 수 있고, 일정을 tap하면 completed 유무를 표시할 수 있습니다.</br>
@@ -94,7 +95,7 @@ Pinned된 일정은 날짜가 지나도 사라지지 않고, list 상단에 고�
 ### 4. Search and Delete Todo
 </br>
 <p>
-<img src="https://im3.ezgif.com/tmp/ezgif-3-ed7c2d2e88.gif" height=400 width=250>
+<img src="https://user-images.githubusercontent.com/107173548/182126019-614d62de-f34d-4d69-88e5-e2f86a2b40b7.gif" height=400 width=250>
 </p>
 </br>
 상단에 search bar를 사용하여 search를 할 수 있고 왼쪽으로 swipe하여 delete 버튼을 tap하게 되면 </br>
