@@ -74,8 +74,8 @@ class CoreDataStore {
             persistentContainer.viewContext.delete(element)
         }
         list.forEach { element in
-            if element.todoAt ?? Date() < Date() && element.createdAt?.day ?? 0 != Date().day {
-                if element.fix && element.completed {
+            if element.todoAt ?? Date() < Date() , element.createdAt?.day ?? 0 != Date().day {
+                if element.fix , element.completed {
                     element.completed.toggle()
                 }
             }
