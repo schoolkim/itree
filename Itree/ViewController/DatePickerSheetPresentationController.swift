@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import SnapKit
 
 protocol UIDatePickerSheetProtocol: AnyObject {
     func tappedOKButton(_ viewController: DatePickerSheetPresentationController)
@@ -41,13 +42,11 @@ class DatePickerSheetPresentationController: UIViewController {
         homeViewController = HomeViewController.create()
         
         view.addSubview(datePicker)
-        datePicker.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            datePicker.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            datePicker.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 30),
-            datePicker.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            datePicker.topAnchor.constraint(equalTo: view.topAnchor, constant: 30)
-        ])
+        datePicker.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalTo(view.snp.bottom).offset(30)
+            make.top.equalTo(view.snp.top).offset(30)
+        }
         
         setupSheet()
         addNavigationBarButtonItem()
@@ -56,11 +55,13 @@ class DatePickerSheetPresentationController: UIViewController {
     private func setupSheet() {
         isModalInPresentation = true
         if let sheet = sheetPresentationController {
-            sheet.detents = [.medium()]
-            sheet.selectedDetentIdentifier = .medium
-            sheet.largestUndimmedDetentIdentifier = .medium
-            sheet.prefersScrollingExpandsWhenScrolledToEdge = false
-            sheet.prefersGrabberVisible = true
+            sheet.do {
+                $0.detents = [.medium()]
+                $0.selectedDetentIdentifier = .medium
+                $0.largestUndimmedDetentIdentifier = .medium
+                $0.prefersScrollingExpandsWhenScrolledToEdge = false
+                $0.prefersGrabberVisible = true
+            }
         }
     }
     
@@ -80,9 +81,11 @@ class DatePickerSheetPresentationController: UIViewController {
             self.dismiss(animated: true, completion: nil)
         }))
         
-        navigationItem.leftBarButtonItem = cancelButton
-        navigationItem.leftBarButtonItem?.tintColor = .black
-        navigationItem.rightBarButtonItem = completedButton
-        navigationItem.rightBarButtonItem?.tintColor = .black
+        navigationItem.do {
+            $0.leftBarButtonItem = cancelButton
+            $0.leftBarButtonItem?.tintColor = .black
+            $0.rightBarButtonItem = completedButton
+            $0.rightBarButtonItem?.tintColor = .black
+        }
     }
 }

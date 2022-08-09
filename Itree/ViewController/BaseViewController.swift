@@ -32,9 +32,7 @@ class BaseViewController: UIViewController {
     }
     
     @objc
-    func willShowKeyboard(frame: CGRect) {
-        
-    }
+    func willShowKeyboard(frame: CGRect) { }
     
     @objc
     private func _willHideKeyboard() {
@@ -44,13 +42,9 @@ class BaseViewController: UIViewController {
     }
     
     @objc
-    func willHideKeyboard() {
-        
-    }
+    func willHideKeyboard() { }
     
-    func willChangeKeyboard(isHidden: Bool) {
-        
-    }
+    func willChangeKeyboard(isHidden: Bool) { }
     
 }
 

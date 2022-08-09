@@ -44,10 +44,14 @@ class TopicViewController: UIViewController {
         let groupLayoutSize = NSCollectionLayoutSize(widthDimension: .estimated(88), heightDimension: .absolute(44))
         let groupLayout = NSCollectionLayoutGroup.horizontal(layoutSize: groupLayoutSize, subitems: [itemLayout])
         let sectionLayout = NSCollectionLayoutSection(group: groupLayout)
-        sectionLayout.orthogonalScrollingBehavior = .continuous
-        sectionLayout.contentInsets.leading = 16
-        sectionLayout.contentInsets.trailing = 16
-        sectionLayout.interGroupSpacing = 16
+        
+        sectionLayout.do {
+            $0.orthogonalScrollingBehavior = .continuous
+            $0.contentInsets.leading = 16
+            $0.contentInsets.trailing = 16
+            $0.interGroupSpacing = 16
+        }
+        
         collectionView.collectionViewLayout = UICollectionViewCompositionalLayout(section: sectionLayout)
     }
     

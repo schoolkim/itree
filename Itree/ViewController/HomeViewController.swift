@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Then
 
 // MARK: ViewController
 
@@ -41,47 +42,47 @@ class HomeViewController: BaseViewController {
         Filter.allCases
     }()
     
-    var collectionViewCellSecondaryTextFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .none
-        formatter.dateFormat = "yyyy년 MM월 dd일 HH시 mm분"
-        return formatter
-    }()
+    var collectionViewCellSecondaryTextFormatter = DateFormatter().then {
+        $0.dateStyle = .none
+        $0.dateFormat = "yyyy년 MM월 dd일 HH시 mm분"
+    }
     
-    var dateLabelTextFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .none
-        formatter.dateFormat = "yyyy/MM/dd - HH:mm "
-        return formatter
-    }()
+    var dateLabelTextFormatter = DateFormatter().then {
+        $0.timeStyle = .none
+        $0.dateFormat = "yyyy/MM/dd - HH:mm "
+    }
     
-    var notificationDateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .none
-        formatter.dateFormat = "yyyy년 MM월 dd일 HH시 mm분 ss초"
-        return formatter
-    }()
+    var notificationDateFormatter = DateFormatter().then {
+        $0.dateStyle = .none
+        $0.dateFormat = "yyyy년 MM월 dd일 HH시 mm분 ss초"
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let addTodoButtonBottomKeyboardConstraint = addToDoButton.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor, constant: -8)
-        addTodoButtonBottomKeyboardConstraint.priority = .defaultLow
-        addTodoButtonBottomKeyboardConstraint.isActive = true
         addTodoButtonBottomConstraint = addToDoButton.bottomAnchor.constraint(equalTo: bottomStackView.topAnchor, constant: -8)
         addTodoButtonBottomConstraint?.priority = .defaultHigh
         bottomStackView.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor).isActive = true
-        
         topicViewController?.applyInitialData(items: topicDataStore)
         let label = createTitleLabel()
         self.navigationItem.leftBarButtonItem = UIBarButtonItem.init(customView: label)
+        let addTodoButtonBottomKeyboardConstraint = addToDoButton.bottomAnchor.constraint(equalTo: view.keyboardLayoutGuide.topAnchor, constant: -8)
         
-        dateLabel.textColor = .label
-        dateLabel.font = UIFont.boldSystemFont(ofSize: 15)
-        dateLabel.text = ""
+        addTodoButtonBottomKeyboardConstraint.do {
+            $0.priority = .defaultLow
+            $0.isActive = true
+        }
         
-        addToDoButton.layer.cornerRadius = 0.5 * addToDoButton.bounds.width
-        addToDoButton.clipsToBounds = true
+        dateLabel.do {
+            $0.textColor = .label
+            $0.font = UIFont.boldSystemFont(ofSize: 15)
+            $0.text = ""
+        }
+        
+        addToDoButton.do {
+            $0.layer.cornerRadius = 0.5 * addToDoButton.bounds.width
+            $0.clipsToBounds = true
+        }
         
         createDatePickerView()
         setupSearchController()
@@ -126,8 +127,11 @@ class HomeViewController: BaseViewController {
             }
             
             dateLabel.text = ""
-            textField.text = ""
-            textField.placeholder = "날짜와 시간을 선택해주세요"
+            
+            textField.do {
+                $0.text = ""
+                $0.placeholder = "날짜와 시간을 선택해주세요"
+            }
         }
     }
     
@@ -145,9 +149,7 @@ class HomeViewController: BaseViewController {
     func tappedDoneButton() {
         guard let dateLabelText = dateLabel.text,
               let textFieldText = textField.text else { return }
-        
-        // TODO: 더 좋은 알고리즘
-        
+       
         if dateLabelText.isEmpty {
             presentAlertController("날짜와 시간을 선택해주세요")
         }
@@ -156,10 +158,14 @@ class HomeViewController: BaseViewController {
             presentAlertController("할 일을 입력해주세요")
         } else {
             coreDataStore.createTodo(text: textFieldText, date: date)
-            textField.resignFirstResponder()
-            textField.text = ""
             dateLabel.text = ""
-            textField.placeholder = "날짜와 시간을 선택해주세요"
+            
+            textField.do {
+                $0.resignFirstResponder()
+                $0.text = ""
+                $0.placeholder = "날짜와 시간을 선택해주세요"
+            }
+            
             UIView.animate(withDuration: 0.5) { [weak self] in
                 guard let self = self else { return }
                 
@@ -195,9 +201,13 @@ class HomeViewController: BaseViewController {
     
     func createTitleLabel() -> UILabel {
         let label = UILabel()
-        label.textColor = .label
-        label.text = "Itree"
-        label.font = UIFont(name: "Unreal_science_yuni", size: 40)
+        
+        label.do {
+            $0.textColor = .label
+            $0.text = "Itree"
+            $0.font = UIFont(name: "Unreal_science_yuni", size: 40)
+        }
+        
         return label
     }
     
@@ -284,9 +294,6 @@ class HomeViewController: BaseViewController {
             self.contentConfiguration = cell.defaultContentConfiguration()
             self.contentConfiguration.imageProperties.tintColor = .label
             self.contentConfiguration.image = itemIdentifier.fix ? UIImage(systemName: "pin.fill") : nil
-            
-            // TODO: fix된 상태로 completed로 바꾼 후 unfix하고 completed 풀면 strikeThrough 적용됨
-            
             self.contentConfiguration.text = nil
             self.contentConfiguration.attributedText = nil
             
@@ -320,7 +327,6 @@ class HomeViewController: BaseViewController {
         let leftSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let doneButton = UIBarButtonItem(title: "done", style: .plain, target: nil, action: #selector(tappedDoneButton))
         var buttonList = [UIBarButtonItem]()
-
         buttonList.append(dateButton)
         buttonList.append(todayButton)
         buttonList.append(leftSpace)

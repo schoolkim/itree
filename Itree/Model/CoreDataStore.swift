@@ -37,13 +37,15 @@ class CoreDataStore {
     
     func createTodo(text: String?, date: Date?) -> Todo {
         let newTodo = Todo(context: persistentContainer.viewContext)
-        newTodo.createdAt = Date()
-        newTodo.updateAt = Date()
-        newTodo.todoAt = date
-        newTodo.content = text
-        newTodo.completed = false
-        newTodo.fix = false
-        newTodo.uuid = UUID()
+        newTodo.do {
+            $0.createdAt = Date()
+            $0.updateAt = Date()
+            $0.todoAt = date
+            $0.content = text
+            $0.completed = false
+            $0.fix = false
+            $0.uuid = UUID()
+        }
         saveContext()
         return newTodo
     }
